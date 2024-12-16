@@ -6,4 +6,10 @@ export default class recognitionAPI extends BaseApi {
 
     return resp.data;
   }
+
+  async passive(formData: FormData) {
+    const resp = await this.fetcher.post("/passive", formData);
+
+    return resp;
+  }
 }

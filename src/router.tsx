@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import MainPage from "@/routes/main/MainPage";
 import Layout from "@/components/layout/Layout";
 import RegisterPage from "./routes/register/RegisterPage";
+import RecognitionPage from "./routes/recognition/RecognitionPage";
 
 const routes = [
   {
@@ -16,6 +17,11 @@ const routes = [
       {
         path: "register",
         element: <RegisterPage />,
+        index: true,
+      },
+      {
+        path: "recognition",
+        element: <RecognitionPage />,
         index: true,
       },
     ],
