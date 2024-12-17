@@ -1,14 +1,27 @@
 import FaceAlignmentPopup from "@/components/face/FaceAlignmentPopup";
-import React, { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import SuccessPopup from "@/components/popup/sucess/SuccessPopup";
 import recognitionAPI from "@/api/recognitionAPI";
+import { useRecoilState } from "recoil";
+import { statusState } from "@/atoms/statusState";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const service = new recognitionAPI(import.meta.env.VITE_BASE_URI);
 
-export default function RecognitionPage() {
+export default function PassiveDetectionPage() {
   const webcamRef = useRef(null);
   const [success, setSuccess] = useState<boolean>(false);
+
+  const [status, setStatus] = useRecoilState(statusState);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (status.status !== "none") {
+      alert("passive를 진행할 차례가 아닙니다.");
+      navigate(-1);
+    }
+  }, []);
 
   const generateFileName = (): string => {
     const now = new Date();
@@ -58,9 +71,14 @@ export default function RecognitionPage() {
           // 3초 후 팝업 닫기
           setTimeout(() => {
             setSuccess(false);
+            setStatus({ status: "passive" });
+            navigate("/active");
           }, 2000);
         } else if (response.data.result[0].prediction === "Fake") {
           setSuccess(false);
+          alert(
+            "passive liveness detection에 실패했습니다.\n다시 시도해 주세요."
+          );
         }
 
         return;
@@ -85,7 +103,7 @@ export default function RecognitionPage() {
           onClick={capture}
           className="bg-[#006FFD] fixed bottom-5 z-[49] py-2 px-5 text-white rounded-[12px] w-[21rem]"
         >
-          촬영하기
+          passive 검사하기
         </button>
       </span>
       <Webcam

@@ -12,7 +12,7 @@ export default function MainPage({}: Props) {
       <button onClick={() => navigate("/register")}>
         데모 이용이 처음이라면? 얼굴 등록하기
       </button>
-      <button onClick={() => navigate("/recognition")}>
+      <button onClick={() => navigate("/passive")}>
         얼굴 등록을 완료했다면? 얼굴 인식하기
       </button>
     </div>

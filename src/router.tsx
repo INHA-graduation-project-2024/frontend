@@ -2,7 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import MainPage from "@/routes/main/MainPage";
 import Layout from "@/components/layout/Layout";
 import RegisterPage from "./routes/register/RegisterPage";
-import RecognitionPage from "./routes/recognition/RecognitionPage";
+import PassiveDetectionPage from "./routes/passive/PassiveDetectionPage";
 
 const routes = [
   {
@@ -20,8 +20,8 @@ const routes = [
         index: true,
       },
       {
-        path: "recognition",
-        element: <RecognitionPage />,
+        path: "passive",
+        element: <PassiveDetectionPage />,
         index: true,
       },
     ],
