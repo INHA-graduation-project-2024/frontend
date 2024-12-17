@@ -12,4 +12,10 @@ export default class recognitionAPI extends BaseApi {
 
     return resp;
   }
+
+  async faceRecognition(formData: FormData) {
+    const resp = await this.fetcher.post("/face-recognition", formData);
+
+    return resp;
+  }
 }
