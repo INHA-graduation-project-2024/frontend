@@ -6,9 +6,9 @@ export interface IRecognitionTypes {
   status: StatusType;
 }
 
-export const StatusState = atom<IRecognitionTypes>({
-  key: "status",
+export const statusState = atom<IRecognitionTypes>({
+  key: "statusState", // unique ID
   default: {
-    status: "none",
+    status: "none", //default는 none으로 설정
   },
 });
