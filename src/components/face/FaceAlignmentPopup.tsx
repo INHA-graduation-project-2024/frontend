@@ -5,7 +5,7 @@ type Props = {};
 
 export default function FaceAlignmentPopup({}: Props) {
   return (
-    <div className="z-[49] fixed top-[15%]">
+    <div className="z-[49] fixed top-[25%] scale-[1.4] transform">
       <img src={FacePopup} alt="Face Alignment Guide" />
     </div>
   );
