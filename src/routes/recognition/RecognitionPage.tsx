@@ -1,27 +1,21 @@
-import FaceAlignmentPopup from "@/components/face/FaceAlignmentPopup";
-import { useCallback, useEffect, useRef, useState } from "react";
-import Webcam from "react-webcam";
-import SuccessPopup from "@/components/popup/sucess/SuccessPopup";
 import recognitionAPI from "@/api/recognitionAPI";
-import { useRecoilState } from "recoil";
 import { statusState } from "@/atoms/statusState";
-import { Navigate, useNavigate } from "react-router-dom";
+import { userState } from "@/atoms/userState";
+import FaceAlignmentPopup from "@/components/face/FaceAlignmentPopup";
+import SuccessPopup from "@/components/popup/sucess/SuccessPopup";
+import { useCallback, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Webcam from "react-webcam";
+import { useRecoilState, useSetRecoilState } from "recoil";
 
 const service = new recognitionAPI(import.meta.env.VITE_BASE_URI);
 
-export default function PassiveDetectionPage() {
+export default function RecognitionPage() {
   const webcamRef = useRef(null);
-  const [success, setSuccess] = useState<boolean>(false);
-
-  const [status, setStatus] = useRecoilState(statusState);
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   if (status.status !== "none") {
-  //     alert("passive detection을 진행할 차례가 아닙니다.");
-  //     navigate(-1);
-  //   }
-  // }, []);
+  const [success, setSuccess] = useState<boolean>(false);
+  const [status, setStatus] = useRecoilState(statusState);
+  const setUser = useSetRecoilState(userState);
 
   const generateFileName = (): string => {
     const now = new Date();
@@ -33,7 +27,7 @@ export default function PassiveDetectionPage() {
     const seconds = String(now.getSeconds()).padStart(2, "0"); // 2자리 초
 
     //형식 : name_YYYYMMDD_HHMMSS.jpeg
-    return `passive_${year}${month}${day}_${hours}${minutes}${seconds}.jpeg`;
+    return `recognition_${year}${month}${day}_${hours}${minutes}${seconds}.jpeg`;
   };
 
   const capture = useCallback(async () => {
@@ -58,35 +52,33 @@ export default function PassiveDetectionPage() {
     formData.append("file", blob, fileName);
 
     try {
-      const response = await service.passive(formData);
+      const response = await service.faceRecognition(formData);
 
       if (response.status === 200) {
-        //200이면
-        console.log(response.data.result[0]);
-        // response.data.result[0].prediction //"Real" or "Fake"
+        console.log(response.data);
+        console.log(response.data.result.ids[0][0]);
 
-        if (response.data.result[0].prediction === "Real") {
+        if (response.data.result.ids.length !== 0) {
           setSuccess(true);
 
           // 3초 후 팝업 닫기
           setTimeout(() => {
             setSuccess(false);
-            setStatus({ status: "passive" });
-            navigate("/active");
+            setStatus({ status: "recognized" });
+            setUser({ name: response.data.result.ids[0][0] });
+            navigate("/welcome");
           }, 2000);
-        } else if (response.data.result[0].prediction === "Fake") {
+        } else {
           setSuccess(false);
-          alert(
-            "passive liveness detection에 실패했습니다.\n다시 시도해 주세요."
-          );
+          alert("face recognition에 실패했습니다.\n다시 시도해 주세요.");
         }
 
         return;
-      } else setSuccess(false);
+      } else throw new Error(response.data);
     } catch (error) {
-      console.error("passive liveness detection 실패:", error);
+      console.error("face recognition 실패:", error);
       setSuccess(false);
-      alert("passive liveness detection에 실패했습니다.\n다시 시도해 주세요.");
+      alert("face recognition에 실패했습니다.\n다시 시도해 주세요.");
     }
   }, [webcamRef]);
 
@@ -94,7 +86,7 @@ export default function PassiveDetectionPage() {
     <div className="h-screen">
       {success && (
         <span className="flex justify-center">
-          <SuccessPopup content={`passive liveness detection 완료!`} />
+          <SuccessPopup content={`face recognition 완료!`} />
         </span>
       )}
       <span className="flex justify-center w-[100%]">
@@ -103,7 +95,7 @@ export default function PassiveDetectionPage() {
           onClick={capture}
           className="bg-[#006FFD] fixed bottom-5 z-[49] py-2 px-5 text-white rounded-[12px] w-[21rem]"
         >
-          passive 검사하기
+          얼굴 인식하기
         </button>
       </span>
       <Webcam

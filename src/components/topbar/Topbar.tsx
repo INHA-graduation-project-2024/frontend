@@ -17,7 +17,9 @@ export default function Topbar({}: Props) {
       </span>
       <p>Demo User</p>
 
-      <BsPersonCircle size={25} color="B3DAFF" />
+      <span onClick={() => navigate("/")}>
+        <BsPersonCircle size={25} color="B3DAFF" />
+      </span>
       {/* </span> */}
     </div>
   );

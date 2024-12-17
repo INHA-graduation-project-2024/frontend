@@ -3,6 +3,9 @@ import MainPage from "@/routes/main/MainPage";
 import Layout from "@/components/layout/Layout";
 import RegisterPage from "./routes/register/RegisterPage";
 import PassiveDetectionPage from "./routes/passive/PassiveDetectionPage";
+import RecognitionPage from "./routes/recognition/RecognitionPage";
+import WelcomePage from "./routes/welcome/WelcomePage";
+import ActiveDetectionPage from "./routes/active/ActiveDetectionPage";
 
 const routes = [
   {
@@ -22,6 +25,21 @@ const routes = [
       {
         path: "passive",
         element: <PassiveDetectionPage />,
+        index: true,
+      },
+      {
+        path: "recognition",
+        element: <RecognitionPage />,
+        index: true,
+      },
+      {
+        path: "welcome",
+        element: <WelcomePage />,
+        index: true,
+      },
+      {
+        path: "active",
+        element: <ActiveDetectionPage />,
         index: true,
       },
     ],
