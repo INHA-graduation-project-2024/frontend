@@ -16,12 +16,12 @@ export default function PassiveDetectionPage() {
   const [status, setStatus] = useRecoilState(statusState);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (status.status !== "none") {
-      alert("passive를 진행할 차례가 아닙니다.");
-      navigate(-1);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (status.status !== "none") {
+  //     alert("passive detection을 진행할 차례가 아닙니다.");
+  //     navigate(-1);
+  //   }
+  // }, []);
 
   const generateFileName = (): string => {
     const now = new Date();
