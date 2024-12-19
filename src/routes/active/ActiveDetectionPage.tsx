@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import Webcam from "react-webcam";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 
-const service = new recognitionAPI("http://34.22.107.184:5000/api");
+const service = new recognitionAPI(import.meta.env.VITE_BASE_URI);
 
 export default function ActiveDetectionPage() {
   const [success, setSuccess] = useState<boolean>(false);
