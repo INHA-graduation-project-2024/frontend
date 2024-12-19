@@ -35,4 +35,4 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H $GCP_HOST >> ~/.ssh/known_hosts
         scp -r ./dist/ $GCP_USER@$GCP_HOST:/home/$GCP_USER/frontend
-        # ssh $GCP_USER@$GCP_HOST "sudo systemctl reload nginx"
+        ssh $GCP_USER@$GCP_HOST "sudo systemctl reload nginx"
