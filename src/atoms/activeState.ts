@@ -1,6 +1,6 @@
 import { atom } from "recoil";
 
-// export type ActiveStatusType = "valid" | "invalid";
+// export type ActiveStatusType = "strat" | "invalid";
 
 export interface IactiveTypes {
   status: boolean;
