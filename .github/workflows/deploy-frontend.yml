@@ -34,7 +34,5 @@ jobs:
         echo "$GCP_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H $GCP_HOST >> ~/.ssh/known_hosts
-        scp -r ./build/ $GCP_USER@$GCP_HOST:/home/$GCP_USER/frontend
-        ssh -o StrictHostKeyChecking=no $GCP_USER@$GCP_HOST "sudo mv /home/$GCP_USER/frontend /var/www/frontend && sudo systemctl reload nginx"
-      
-
+        scp -r ./dist/ $GCP_USER@$GCP_HOST:/home/$GCP_USER/frontend
+        # ssh $GCP_USER@$GCP_HOST "sudo systemctl reload nginx"
