@@ -6,15 +6,16 @@ import SuccessPopup from "@/components/popup/sucess/SuccessPopup";
 import { useCallback, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Webcam from "react-webcam";
-import { useRecoilState, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 
 const service = new recognitionAPI(import.meta.env.VITE_BASE_URI);
 
 export default function RecognitionPage() {
-  const webcamRef = useRef(null);
+  const webcamRef = useRef<Webcam | null>(null);
   const navigate = useNavigate();
   const [success, setSuccess] = useState<boolean>(false);
-  const [status, setStatus] = useRecoilState(statusState);
+  // const [status, setStatus] = useRecoilState(statusState);
+  const setStatus = useSetRecoilState(statusState);
   const setUser = useSetRecoilState(userState);
 
   const generateFileName = (): string => {
@@ -31,54 +32,57 @@ export default function RecognitionPage() {
   };
 
   const capture = useCallback(async () => {
-    const imageSrc = webcamRef.current.getScreenshot();
-    // console.log(imageSrc);
-    if (!imageSrc) {
-      console.error("이미지 캡쳐 실패!");
-      alert("다시 시도해 주세요.");
-    }
-
-    const base64Data = imageSrc.split(",")[1];
-    const byteCharacters = atob(base64Data);
-    const byteNumbers = Array.from(byteCharacters).map((char) =>
-      char.charCodeAt(0)
-    );
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: "image/jpeg" });
-
-    const fileName = generateFileName();
-
-    const formData = new FormData();
-    formData.append("file", blob, fileName);
-
-    try {
-      const response = await service.faceRecognition(formData);
-
-      if (response.status === 200) {
-        console.log(response.data);
-        console.log(response.data.result.ids[0][0]);
-
-        if (response.data.result.ids.length !== 0) {
-          setSuccess(true);
-
-          // 3초 후 팝업 닫기
-          setTimeout(() => {
-            setSuccess(false);
-            setStatus({ status: "recognized" });
-            setUser({ name: response.data.result.ids[0][0] });
-            navigate("/welcome");
-          }, 2000);
-        } else {
-          setSuccess(false);
-          alert("face recognition에 실패했습니다.\n다시 시도해 주세요.");
-        }
-
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      // console.log(imageSrc);
+      if (!imageSrc) {
+        console.error("이미지 캡쳐 실패!");
+        alert("다시 시도해 주세요.");
         return;
-      } else throw new Error(response.data);
-    } catch (error) {
-      console.error("face recognition 실패:", error);
-      setSuccess(false);
-      alert("face recognition에 실패했습니다.\n다시 시도해 주세요.");
+      }
+
+      const base64Data = imageSrc.split(",")[1];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = Array.from(byteCharacters).map((char) =>
+        char.charCodeAt(0)
+      );
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: "image/jpeg" });
+
+      const fileName = generateFileName();
+
+      const formData = new FormData();
+      formData.append("file", blob, fileName);
+
+      try {
+        const response = await service.faceRecognition(formData);
+
+        if (response.status === 200) {
+          console.log(response.data);
+          console.log(response.data.result.ids[0][0]);
+
+          if (response.data.result.ids.length !== 0) {
+            setSuccess(true);
+
+            // 3초 후 팝업 닫기
+            setTimeout(() => {
+              setSuccess(false);
+              setStatus({ status: "recognized" });
+              setUser({ name: response.data.result.ids[0][0] });
+              navigate("/welcome");
+            }, 2000);
+          } else {
+            setSuccess(false);
+            alert("face recognition에 실패했습니다.\n다시 시도해 주세요.");
+          }
+
+          return;
+        } else throw new Error(response.data);
+      } catch (error) {
+        console.error("face recognition 실패:", error);
+        setSuccess(false);
+        alert("face recognition에 실패했습니다.\n다시 시도해 주세요.");
+      }
     }
   }, [webcamRef]);
 

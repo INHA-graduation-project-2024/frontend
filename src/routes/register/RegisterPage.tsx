@@ -8,7 +8,7 @@ import SuccessPopup from "@/components/popup/sucess/SuccessPopup";
 const service = new recognitionAPI(import.meta.env.VITE_BASE_URI);
 
 export default function RegisterPage() {
-  const webcamRef = useRef(null);
+  const webcamRef = useRef<Webcam | null>(null);
   const [name, setName] = useState<string>("");
   const [validPopup, setValidPopup] = useState<boolean>(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null); // 캡처한 이미지 저장
@@ -29,15 +29,17 @@ export default function RegisterPage() {
   };
 
   const capture = useCallback(() => {
-    const imageSrc = webcamRef.current.getScreenshot();
-    // console.log(imageSrc);
-    if (!imageSrc) {
-      console.error("이미지 캡쳐 실패!");
-      alert("다시 시도해 주세요.");
-    }
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      // console.log(imageSrc);
+      if (!imageSrc) {
+        console.error("이미지 캡쳐 실패!");
+        alert("다시 시도해 주세요.");
+      }
 
-    setCapturedImage(imageSrc); // 캡처한 이미지 저장
-    setValidPopup(true); // 모달 활성화
+      setCapturedImage(imageSrc); // 캡처한 이미지 저장
+      setValidPopup(true); // 모달 활성화
+    }
   }, [webcamRef]);
 
   const submitRegistration = useCallback(async () => {
