@@ -5,7 +5,7 @@ import SuccessPopup from "@/components/popup/sucess/SuccessPopup";
 import recognitionAPI from "@/api/recognitionAPI";
 import { useRecoilState } from "recoil";
 import { statusState } from "@/atoms/statusState";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const service = new recognitionAPI(import.meta.env.VITE_BASE_URI);
 
@@ -68,7 +68,7 @@ export default function PassiveDetectionPage() {
         if (response.data.result[0].prediction === "Real") {
           setSuccess(true);
 
-          // 3초 후 팝업 닫기
+          // 2초 후 팝업 닫기
           setTimeout(() => {
             setSuccess(false);
             setStatus({ status: "passive" });
@@ -76,9 +76,9 @@ export default function PassiveDetectionPage() {
           }, 2000);
         } else if (response.data.result[0].prediction === "Fake") {
           setSuccess(false);
-          alert(
-            "passive liveness detection에 실패했습니다.\n다시 시도해 주세요."
-          );
+          // alert(
+          //   "passive liveness detection에 실패했습니다.\n다시 시도해 주세요."
+          // );
         }
 
         return;
