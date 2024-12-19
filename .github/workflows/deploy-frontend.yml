@@ -22,6 +22,8 @@ jobs:
       run: npm ci
 
     - name: Build frontend
+      env:
+        VITE_BASE_URI: ${{ secrets.VITE_BASE_URL }}
       run: npm run build
 
     - name: Deploy to GCP VM
@@ -34,5 +36,5 @@ jobs:
         echo "$GCP_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H $GCP_HOST >> ~/.ssh/known_hosts
-        scp -r ./dist/ $GCP_USER@$GCP_HOST:/home/$GCP_USER/frontend
-        # ssh $GCP_USER@$GCP_HOST "sudo systemctl reload nginx"
+        scp -r ./dist/* $GCP_USER@$GCP_HOST:/home/$GCP_USER/frontend
+        ssh $GCP_USER@$GCP_HOST "sudo systemctl reload nginx"
