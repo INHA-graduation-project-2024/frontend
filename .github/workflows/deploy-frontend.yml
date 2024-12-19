@@ -1,0 +1,39 @@
+name: deploy frontend to gcp vm
+
+on:
+  push:
+    branches:
+      - release
+jobs:
+  deploy:
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '22' 
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build frontend
+      run: npm run build
+
+    - name: Deploy to GCP VM
+      env:
+        GCP_SSH_PRIVATE_KEY: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
+        GCP_HOST: ${{ secrets.GCP_HOST }}
+        GCP_USER: ${{ secrets.GCP_USER }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "$GCP_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        scp -r ./build/ $GCP_USER@$GCP_HOST:/home/$GCP_USER/frontend
+        ssh -o StrictHostKeyChecking=no $GCP_USER@$GCP_HOST "sudo mv /home/$GCP_USER/frontend /var/www/frontend && sudo systemctl reload nginx"
+      
+
