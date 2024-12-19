@@ -101,32 +101,32 @@ export default function ActiveDetectionPage() {
     }
   };
 
-  const saveRecording = () => {
-    // 비디오 저장
-    if (videoChunks.length) {
-      const blob = new Blob(videoChunks, { type: "video/webm" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "recorded-video.webm";
-      a.click();
-      URL.revokeObjectURL(url);
-      setVideoChunks([]);
-    }
+  // const saveRecording = () => {
+  //   // 비디오 저장
+  //   if (videoChunks.length) {
+  //     const blob = new Blob(videoChunks, { type: "video/webm" });
+  //     const url = URL.createObjectURL(blob);
+  //     const a = document.createElement("a");
+  //     a.href = url;
+  //     a.download = "recorded-video.webm";
+  //     a.click();
+  //     URL.revokeObjectURL(url);
+  //     setVideoChunks([]);
+  //   }
 
-    //오디오 저장
-    if (audioChunks.length) {
-      const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
-      const audioUrl = URL.createObjectURL(audioBlob);
+  //   //오디오 저장
+  //   if (audioChunks.length) {
+  //     const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+  //     const audioUrl = URL.createObjectURL(audioBlob);
 
-      const audioLink = document.createElement("a");
-      audioLink.href = audioUrl;
-      audioLink.download = "recorded-audio.webm";
-      audioLink.click();
-      URL.revokeObjectURL(audioUrl);
-      setAudioChunks([]);
-    }
-  };
+  //     const audioLink = document.createElement("a");
+  //     audioLink.href = audioUrl;
+  //     audioLink.download = "recorded-audio.webm";
+  //     audioLink.click();
+  //     URL.revokeObjectURL(audioUrl);
+  //     setAudioChunks([]);
+  //   }
+  // };
 
   const generateFileName = useCallback((): string => {
     const now = new Date();

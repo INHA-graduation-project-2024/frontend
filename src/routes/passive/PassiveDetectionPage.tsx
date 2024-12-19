@@ -1,19 +1,20 @@
 import FaceAlignmentPopup from "@/components/face/FaceAlignmentPopup";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import SuccessPopup from "@/components/popup/sucess/SuccessPopup";
 import recognitionAPI from "@/api/recognitionAPI";
-import { useRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { statusState } from "@/atoms/statusState";
 import { useNavigate } from "react-router-dom";
 
 const service = new recognitionAPI(import.meta.env.VITE_BASE_URI);
 
 export default function PassiveDetectionPage() {
-  const webcamRef = useRef(null);
+  const webcamRef = useRef<Webcam | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
 
-  const [status, setStatus] = useRecoilState(statusState);
+  // const [status, setStatus] = useRecoilState(statusState);
+  const setStatus = useSetRecoilState(statusState);
   const navigate = useNavigate();
 
   // useEffect(() => {
@@ -37,56 +38,61 @@ export default function PassiveDetectionPage() {
   };
 
   const capture = useCallback(async () => {
-    const imageSrc = webcamRef.current.getScreenshot();
-    // console.log(imageSrc);
-    if (!imageSrc) {
-      console.error("이미지 캡쳐 실패!");
-      alert("다시 시도해 주세요.");
-    }
-
-    const base64Data = imageSrc.split(",")[1];
-    const byteCharacters = atob(base64Data);
-    const byteNumbers = Array.from(byteCharacters).map((char) =>
-      char.charCodeAt(0)
-    );
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: "image/jpeg" });
-
-    const fileName = generateFileName();
-
-    const formData = new FormData();
-    formData.append("file", blob, fileName);
-
-    try {
-      const response = await service.passive(formData);
-
-      if (response.status === 200) {
-        //200이면
-        console.log(response.data.result[0]);
-        // response.data.result[0].prediction //"Real" or "Fake"
-
-        if (response.data.result[0].prediction === "Real") {
-          setSuccess(true);
-
-          // 2초 후 팝업 닫기
-          setTimeout(() => {
-            setSuccess(false);
-            setStatus({ status: "passive" });
-            navigate("/active");
-          }, 2000);
-        } else if (response.data.result[0].prediction === "Fake") {
-          setSuccess(false);
-          // alert(
-          //   "passive liveness detection에 실패했습니다.\n다시 시도해 주세요."
-          // );
-        }
-
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      // console.log(imageSrc);
+      if (!imageSrc) {
+        console.error("이미지 캡쳐 실패!");
+        alert("다시 시도해 주세요.");
         return;
-      } else setSuccess(false);
-    } catch (error) {
-      console.error("passive liveness detection 실패:", error);
-      setSuccess(false);
-      alert("passive liveness detection에 실패했습니다.\n다시 시도해 주세요.");
+      }
+
+      const base64Data = imageSrc.split(",")[1];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = Array.from(byteCharacters).map((char) =>
+        char.charCodeAt(0)
+      );
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: "image/jpeg" });
+
+      const fileName = generateFileName();
+
+      const formData = new FormData();
+      formData.append("file", blob, fileName);
+
+      try {
+        const response = await service.passive(formData);
+
+        if (response.status === 200) {
+          //200이면
+          console.log(response.data.result[0]);
+          // response.data.result[0].prediction //"Real" or "Fake"
+
+          if (response.data.result[0].prediction === "Real") {
+            setSuccess(true);
+
+            // 2초 후 팝업 닫기
+            setTimeout(() => {
+              setSuccess(false);
+              setStatus({ status: "passive" });
+              navigate("/active");
+            }, 2000);
+          } else if (response.data.result[0].prediction === "Fake") {
+            setSuccess(false);
+            // alert(
+            //   "passive liveness detection에 실패했습니다.\n다시 시도해 주세요."
+            // );
+          }
+
+          return;
+        } else setSuccess(false);
+      } catch (error) {
+        console.error("passive liveness detection 실패:", error);
+        setSuccess(false);
+        alert(
+          "passive liveness detection에 실패했습니다.\n다시 시도해 주세요."
+        );
+      }
     }
   }, [webcamRef]);
 
