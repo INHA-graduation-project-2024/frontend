@@ -194,7 +194,7 @@ export default function ActiveDetectionPage() {
   return (
     <div className="h-screen" onClick={() => setWordPopup(false)}>
       {loading && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-[101]">
           <div className="text-white text-lg">로딩 중입니다...</div>
         </div>
       )}
