@@ -14,6 +14,7 @@ const service = new recognitionAPI(import.meta.env.VITE_BASE_URI);
 export default function ActiveDetectionPage() {
   const [success, setSuccess] = useState<boolean>(false);
   const [wordPopup, setWordPopup] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false); // 로딩 상태 추가\
   const webcamRef = useRef<Webcam>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
 
@@ -142,6 +143,7 @@ export default function ActiveDetectionPage() {
   }, []);
 
   const postFile = async () => {
+    setLoading(true); // 로딩 시작
     const videoBlob = new Blob(videoChunks, { type: "video/webm" });
     const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
 
@@ -184,11 +186,19 @@ export default function ActiveDetectionPage() {
       console.log("active liveness detection 실패 : ", error);
       setSuccess(false);
       alert("active liveness detection에 실패했습니다.\n다시 한번 읽어주세요.");
+    } finally {
+      setLoading(false); //로딩 종료
     }
   };
 
   return (
     <div className="h-screen" onClick={() => setWordPopup(false)}>
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
+          <div className="text-white text-lg">로딩 중입니다...</div>
+        </div>
+      )}
+
       {success && (
         <span className="flex justify-center">
           <SuccessPopup content={`active liveness detection 완료!`} />
