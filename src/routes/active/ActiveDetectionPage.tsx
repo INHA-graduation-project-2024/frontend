@@ -176,6 +176,10 @@ export default function ActiveDetectionPage() {
           }, 2000);
         } else {
           console.log("'엄마' 문자열이 포함되어 있지 않습니다.");
+          alert(
+            "추론 결과에 '엄마' 문자열이 포함되어 있지 않습니다.\npredictedSentence : " +
+              predictedSentence
+          );
           setSuccess(false);
         }
 
