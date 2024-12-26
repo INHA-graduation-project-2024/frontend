@@ -3,14 +3,17 @@ import FaceAlignmentPopup from "@/components/face/FaceAlignmentPopup";
 import InsertNamePopup from "@/components/popup/insertName/InsertNamePopup";
 import { useCallback, useRef, useState } from "react";
 import recognitionAPI from "@/api/recognitionAPI";
+import SuccessPopup from "@/components/popup/sucess/SuccessPopup";
 
 const service = new recognitionAPI(import.meta.env.VITE_BASE_URI);
 
 export default function RegisterPage() {
-  const webcamRef = useRef(null);
+  const webcamRef = useRef<Webcam | null>(null);
   const [name, setName] = useState<string>("");
   const [validPopup, setValidPopup] = useState<boolean>(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null); // 캡처한 이미지 저장
+  const [success, setSuccess] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
 
   const generateFileName = (name: string): string => {
     const now = new Date();
@@ -26,15 +29,17 @@ export default function RegisterPage() {
   };
 
   const capture = useCallback(() => {
-    const imageSrc = webcamRef.current.getScreenshot();
-    // console.log(imageSrc);
-    if (!imageSrc) {
-      console.error("이미지 캡쳐 실패!");
-      alert("다시 시도해 주세요.");
-    }
+    if (webcamRef.current) {
+      const imageSrc = webcamRef.current.getScreenshot();
+      // console.log(imageSrc);
+      if (!imageSrc) {
+        console.error("이미지 캡쳐 실패!");
+        alert("다시 시도해 주세요.");
+      }
 
-    setCapturedImage(imageSrc); // 캡처한 이미지 저장
-    setValidPopup(true); // 모달 활성화
+      setCapturedImage(imageSrc); // 캡처한 이미지 저장
+      setValidPopup(true); // 모달 활성화
+    }
   }, [webcamRef]);
 
   const submitRegistration = useCallback(async () => {
@@ -58,11 +63,21 @@ export default function RegisterPage() {
 
     try {
       const response = await service.join(formData);
-      alert(`${response.message}`);
+      // alert(`${response.message}`);
+      if (response.status === 200) {
+        console.log(response);
+        // console.log(response.data.message);
+        setMessage(response.data.message);
+        setSuccess(true);
+        setTimeout(() => {
+          setSuccess(false);
+        }, 2000);
+      }
       setValidPopup(false); // 모달 비활성화
       setName(""); // 이름 초기화
     } catch (error) {
       console.error("얼굴 등록 실패:", error);
+      setSuccess(false);
       alert("얼굴 등록에 실패했습니다.\n다시 시도해 주세요.");
     }
   }, [capturedImage, name]);
@@ -78,6 +93,11 @@ export default function RegisterPage() {
             // setValidPopup={setValidPopup}
             onSubmit={submitRegistration}
           />
+        </span>
+      )}
+      {success && (
+        <span className="flex justify-center">
+          <SuccessPopup content={`${message}`} />
         </span>
       )}
       <span className="flex justify-center w-[100%]">
